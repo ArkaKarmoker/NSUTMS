@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Driver Dashboard - NSUTMS</title>
+
+    <link href="../assets/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/custom.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+
+    <style>
+        /* --- DASHBOARD STYLES (MATCHING ADMIN/STUDENT THEME) --- */
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3a0ca3;
+            --accent-color: #4cc9f0;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --success-color: #4CAF50;
+            --warning-color: #ff9800;
+            --danger-color: #f44336;
+            --sidebar-width: 250px;
+            --header-height: 70px;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fb;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        .admin-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .admin-sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 0;
+            box-shadow: 3px 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            position: fixed;
+            height: 100%;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-header h3 {
+            font-weight: 600;
+            margin: 0;
+            font-size: 1.4rem;
+        }
+
+        .sidebar-header p {
+            opacity: 0.8;
+            font-size: 0.9rem;
+            margin: 5px 0 0;
+        }
+
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+
+        .menu-item {
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+            cursor: pointer;
+        }
+
+        .menu-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid var(--accent-color);
+            color: white;
+            text-decoration: none;
+        }
+
+        .menu-item.active {
+            background-color: rgba(255, 255, 255, 0.15);
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .menu-item i {
+            margin-right: 12px;
+            font-size: 1.1rem;
+            width: 25px;
+            text-align: center;
+        }
+
+        .admin-main {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 0;
+        }
+
+        .admin-header {
+            height: var(--header-height);
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 25px;
+            position: sticky;
+            top: 0;
+            z-index: 99;
+        }
+
+        .header-left h1 {
+            font-size: 1.5rem;
+            color: var(--dark-color);
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .welcome-text {
+            font-size: 0.95rem;
+            color: #666;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 12px;
+            font-size: 1.2rem;
+        }
+
+        .logout-btn {
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-weight: 500;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .logout-btn:hover {
+            background-color: #d32f2f;
+            color: white;
+            text-decoration: none;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(244, 67, 54, 0.3);
+        }
+
+        .logout-btn i {
+            margin-right: 6px;
+        }
+
+        .profile-btn-header {
+            background-color: transparent;
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-weight: 500;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .profile-btn-header:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .dashboard-content {
+            padding: 25px;
+        }
+
+        .welcome-card {
+            background: linear-gradient(135deg, var(--primary-color), #5a6ff0);
+            color: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.2);
+        }
+
+        .welcome-card h2 {
+            font-weight: 600;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .welcome-card p {
+            opacity: 0.9;
+            margin-bottom: 0;
+            font-size: 1.1rem;
+        }
+
+        .content-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+            height: 100%;
+            transition: all 0.3s;
+            border-top: 4px solid var(--primary-color);
+        }
+
+        .content-card.action-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            justify-content: center;
+            border-top-color: var(--warning-color);
+        }
+
+        .content-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .action-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background-color: #fff8e1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: var(--warning-color);
+            transition: all 0.3s;
+        }
+
+        .content-card:hover .action-icon {
+            background-color: var(--warning-color);
+            color: white;
+        }
+
+        .section-header {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            color: var(--primary-color);
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #777;
+            font-size: 0.9rem;
+            border-top: 1px solid #eee;
+            margin-top: 30px;
+        }
+
+        .profile-label {
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .profile-value {
+            font-size: 1.1rem;
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        @media (max-width: 992px) {
+            .admin-sidebar {
+                width: 70px;
+                overflow: hidden;
+            }
+
+            .admin-sidebar:hover {
+                width: var(--sidebar-width);
+            }
+
+            .sidebar-header h3,
+            .sidebar-header p,
+            .menu-item span {
+                display: none;
+            }
+
+            .admin-sidebar:hover .sidebar-header h3,
+            .admin-sidebar:hover .sidebar-header p,
+            .admin-sidebar:hover .menu-item span {
+                display: block;
+            }
+
+            .admin-main {
+                margin-left: 70px;
+            }
+
+            .admin-sidebar:hover .menu-item i {
+                margin-right: 12px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .admin-sidebar {
+                display: none;
+            }
+
+            .admin-main {
+                margin-left: 0;
+            }
+
+            .admin-header {
+                padding: 0 15px;
+                flex-direction: column;
+                height: auto;
+                padding: 15px;
+            }
+
+            .header-left {
+                margin-bottom: 15px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="admin-container">
+        <div class="admin-sidebar">
+            <div class="sidebar-header">
+                <h3>Driver Portal</h3>
+                <p>NSUTMS</p>
+            </div>
+
+            <div class="sidebar-menu">
+                <a href="dashboard.html" class="menu-item active">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="map.html" class="menu-item">
+                    <i class="fas fa-map"></i>
+                    <span>Route Map</span>
+                </a>
+                <a href="manage_ride.html" class="menu-item">
+                    <i class="fas fa-bus"></i>
+                    <span>Manage Ride</span>
+                </a>
+                <div class="menu-item" data-bs-toggle="modal" data-bs-target="#profileModal">
+                    <i class="fas fa-user-circle"></i>
+                    <span>View Profile</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="admin-main">
+            <div class="admin-header">
+                <div class="header-left">
+                    <h1>Driver Dashboard</h1>
+                    <div class="welcome-text">Welcome, <span id="headerFirstName"></span></div>
+                </div>
+
+                <div class="user-info">
+                    <div class="user-avatar" id="headerAvatar">
+                        D
+                    </div>
+                    <button class="profile-btn-header" data-bs-toggle="modal" data-bs-target="#profileModal">
+                        <i class="fas fa-user me-2"></i> Profile
+                    </button>
+                    <a href="#" class="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                </div>
+            </div>
+
+            <div class="dashboard-content">
+
+                <div class="welcome-card">
+                    <h2>Welcome back, <span id="welcomeFirstName"></span>!</h2>
+                    <p>View your assigned trips and update ride statuses below.</p>
+                </div>
+
+                <div class="row g-4 mb-4">
+                    <div class="col-md-6 col-lg-4">
+                        <div class="content-card action-card">
+                            <div class="action-icon">
+                                <i class="fas fa-play-circle"></i>
+                            </div>
+                            <h5>Current Operations</h5>
+                            <p class="text-muted small mb-3">Update status for your assigned trips</p>
+                            <a href="manage_ride.html" class="btn btn-primary w-100">Manage Active Ride</a>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-4">
+                        <div class="content-card action-card" style="border-top-color: var(--success-color);">
+                            <div class="action-icon" style="background-color: #e8f5e9; color: var(--success-color);">
+                                <i class="fas fa-check-double"></i>
+                            </div>
+                            <h5>Completed Rides</h5>
+                            <p class="text-muted small mb-1">Total trips finished successfully</p>
+                            <h2 class="mb-0 fw-bold text-success" id="totalCompletedRides">0</h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content-card">
+                    <h3 class="section-header"><i class="fas fa-history me-2"></i> My Rides History</h3>
+                    <div class="table-responsive">
+                        <div id="ridesList"></div>
+                    </div>
+                </div>
+
+                <div class="footer">
+                    <p>NSUTMS &copy; <span id="currentYear"></span> | Driver Portal</p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="profileModalLabel"><i class="fas fa-id-card me-2"></i>My Driver Profile
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-4">
+                        <div class="user-avatar mx-auto" id="modalAvatar"
+                            style="width: 80px; height: 80px; font-size: 2rem;">
+                            D
+                        </div>
+                        <h4 class="mt-2" id="modalFullName">Driver Name</h4>
+                        <span class="badge bg-secondary">Role: Driver</span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="profile-label">Email Address</div>
+                            <div class="profile-value" id="modalEmail">-</div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="profile-label">Phone Number</div>
+                            <div class="profile-value" id="modalPhone">-</div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="profile-label">Gender</div>
+                            <div class="profile-value" id="modalGender">-</div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="profile-label">Driving License</div>
+                            <div class="profile-value" id="modalLicense">-</div>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-warning mt-2 mb-0 d-flex align-items-center">
+                        <i class="fas fa-exclamation-circle me-3 fa-2x"></i>
+                        <div>
+                            <strong>Need to update information?</strong><br>
+                            Please contact the admin at <a href="mailto:admin@example.com"
+                                class="alert-link">admin@example.com</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../assets/js/jquery.min.js"></script>
+    <script src="../assets/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+    <script src="../assets/js/db.js"></script>
+    <script src="../assets/js/custom.js"></script>
+
+    <script>
+        const user = requireAuth('driver');
+        if (user) {
+            $('#headerFirstName').text(user.first_name);
+            $('#welcomeFirstName').text(user.first_name);
+            $('#headerAvatar').text(user.first_name.charAt(0).toUpperCase());
+
+            // Profile Modal
+            $('#modalAvatar').text(user.first_name.charAt(0).toUpperCase());
+            $('#modalFullName').text(user.first_name + ' ' + user.last_name);
+            $('#modalEmail').text(user.email);
+            $('#modalPhone').text(user.phone || 'N/A');
+            $('#modalGender').text((user.gender || 'N/A').toUpperCase());
+            $('#modalLicense').text(user.driving_license || 'N/A');
+        }
+        $('#currentYear').text(new Date().getFullYear());
+
+        // Fix modal open/close on file:// protocol
+        $(document).on('click', '[data-bs-target="#profileModal"]', function () {
+            $('#profileModal').modal('show');
+        });
+        $(document).on('click', '.btn-close, [data-bs-dismiss="modal"]', function () {
+            $(this).closest('.modal').modal('hide');
+        });
+
+        function loadRides() {
+            var html = '<table id="ridesTable" class="table table-hover table-bordered"><thead><tr><th>Trip Date</th><th>Destination</th><th>Time</th><th>Status</th><th>Started At</th><th>Ended At</th></tr></thead><tbody>';
+
+            const myRides = db.rides.filter(r => r.driver_id == user.id);
+            myRides.forEach(function (ride) {
+                const dest = db.destinations.find(d => d.id == ride.destination_id) || { name: "Unknown" };
+                const time = db.bus_times.find(t => t.id == ride.time_id) || { time: "-" };
+
+                let badgeClass = 'bg-secondary';
+                if (ride.status === 'completed') badgeClass = 'bg-success';
+                else if (ride.status === 'ended') badgeClass = 'bg-info text-dark';
+                else if (ride.status === 'cancelled') badgeClass = 'bg-danger';
+                else if (ride.status === 'started') badgeClass = 'bg-primary';
+                else if (ride.status === 'pending') badgeClass = 'bg-warning text-dark';
+
+                html += '<tr>';
+                html += '<td>' + ride.trip_date + '</td>';
+                html += '<td>' + dest.name + '</td>';
+                html += '<td>' + time.time + '</td>';
+                html += '<td><span class="badge ' + badgeClass + '">' + (ride.status.charAt(0).toUpperCase() + ride.status.slice(1)) + '</span></td>';
+                html += '<td>' + (ride.started_at ? new Date(ride.started_at).toLocaleTimeString() : '-') + '</td>';
+                html += '<td>' + (ride.ended_at ? new Date(ride.ended_at).toLocaleTimeString() : '-') + '</td>';
+                html += '</tr>';
+            });
+            html += '</tbody></table>';
+
+            if ($.fn.DataTable.isDataTable('#ridesTable')) $('#ridesTable').DataTable().destroy();
+            $('#ridesList').html(html);
+
+            // Update Total Completed Rides Card
+            const totalCompleted = myRides.filter(r => r.status === 'completed' || r.status === 'ended').length;
+            $('#totalCompletedRides').text(totalCompleted);
+
+            $('#ridesTable').DataTable({
+                "order": [[0, "desc"]]
+            });
+        }
+
+        $(document).ready(function () {
+            loadRides();
+            $('.welcome-card').hide().fadeIn(800);
+        });
+    </script>
+</body>
+
+</html>

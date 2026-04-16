@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Buses - Admin Dashboard</title>
+    <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/custom.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+    <style>
+        /* --- DASHBOARD STYLES START --- */
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3a0ca3;
+            --accent-color: #4cc9f0;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --success-color: #4CAF50;
+            --warning-color: #ff9800;
+            --danger-color: #f44336;
+            --sidebar-width: 250px;
+            --header-height: 70px;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fb;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        .admin-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .admin-sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 0;
+            box-shadow: 3px 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            position: fixed;
+            height: 100%;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-header h3 {
+            font-weight: 600;
+            margin: 0;
+            font-size: 1.4rem;
+        }
+
+        .sidebar-header p {
+            opacity: 0.8;
+            font-size: 0.9rem;
+            margin: 5px 0 0;
+        }
+
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+
+        .menu-item {
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+        }
+
+        .menu-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid var(--accent-color);
+            color: white;
+            text-decoration: none;
+        }
+
+        .menu-item.active {
+            background-color: rgba(255, 255, 255, 0.15);
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .menu-item i {
+            margin-right: 12px;
+            font-size: 1.1rem;
+            width: 25px;
+            text-align: center;
+        }
+
+        /* Main Content Area */
+        .admin-main {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 0;
+        }
+
+        .admin-header {
+            height: var(--header-height);
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 25px;
+            position: sticky;
+            top: 0;
+            z-index: 99;
+        }
+
+        .header-left h1 {
+            font-size: 1.5rem;
+            color: var(--dark-color);
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .welcome-text {
+            font-size: 0.95rem;
+            color: #666;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 12px;
+            font-size: 1.2rem;
+        }
+
+        .logout-btn {
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-weight: 500;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .logout-btn:hover {
+            background-color: #d32f2f;
+            color: white;
+            text-decoration: none;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(244, 67, 54, 0.3);
+        }
+
+        .logout-btn i {
+            margin-right: 6px;
+        }
+
+        /* Dashboard Content */
+        .dashboard-content {
+            padding: 25px;
+        }
+
+        .content-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+
+        .section-header {
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            color: var(--primary-color);
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #777;
+            font-size: 0.9rem;
+            border-top: 1px solid #eee;
+            margin-top: 30px;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .admin-sidebar {
+                width: 70px;
+                overflow: hidden;
+            }
+
+            .admin-sidebar:hover {
+                width: var(--sidebar-width);
+            }
+
+            .sidebar-header h3,
+            .sidebar-header p,
+            .menu-item span {
+                display: none;
+            }
+
+            .admin-sidebar:hover .sidebar-header h3,
+            .admin-sidebar:hover .sidebar-header p,
+            .admin-sidebar:hover .menu-item span {
+                display: block;
+            }
+
+            .admin-main {
+                margin-left: 70px;
+            }
+
+            .admin-sidebar:hover .menu-item i {
+                margin-right: 12px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .admin-sidebar {
+                display: none;
+            }
+
+            .admin-main {
+                margin-left: 0;
+            }
+
+            .admin-header {
+                padding: 15px;
+                flex-direction: column;
+                height: auto;
+            }
+
+            .header-left {
+                margin-bottom: 15px;
+                text-align: center;
+            }
+        }
+
+        /* Fix modal close buttons */
+        .btn-close {
+            box-sizing: content-box;
+            width: 1em;
+            height: 1em;
+            padding: .25em .25em;
+            color: #000;
+            background: transparent url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'%3e%3cpath d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/%3e%3c/svg%3e") center/1em auto no-repeat;
+            border: 0;
+            border-radius: .25rem;
+            opacity: .5;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="admin-container">
+        <div class="admin-sidebar">
+            <div class="sidebar-header">
+                <h3>Admin Portal</h3>
+                <p>NSUTMS</p>
+            </div>
+
+            <div class="sidebar-menu">
+                <a href="dashboard.html" class="menu-item">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="map.html" class="menu-item">
+                    <i class="fas fa-map"></i>
+                    <span>Route Map</span>
+                </a>
+                <a href="track_buses.html" class="menu-item">
+                    <i class="fas fa-satellite-dish"></i>
+                    <span>Track Buses</span>
+                </a>
+                <a href="manage_users.html" class="menu-item">
+                    <i class="fas fa-users"></i>
+                    <span>Manage Users</span>
+                </a>
+                <a href="manage_destinations.html" class="menu-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>Manage Destinations</span>
+                </a>
+                <a href="manage_buses.html" class="menu-item active">
+                    <i class="fas fa-bus"></i>
+                    <span>Manage Buses</span>
+                </a>
+                <a href="manage_payments.html" class="menu-item">
+                    <i class="fas fa-credit-card"></i>
+                    <span>Manage Payments</span>
+                </a>
+                <a href="manage_rides.html" class="menu-item">
+                    <i class="fas fa-route"></i>
+                    <span>Manage Rides</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="admin-main">
+            <div class="admin-header">
+                <div class="header-left">
+                    <h1>Manage Buses</h1>
+                    <div class="welcome-text">Administration Panel</div>
+                </div>
+
+                <div class="user-info">
+                    <div class="user-avatar" id="headerAvatar">
+                        A
+                    </div>
+                    <a href="#" class="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                </div>
+            </div>
+
+            <div class="dashboard-content">
+
+                <div class="content-card">
+                    <h2 class="section-header"><i class="fas fa-plus-circle"></i> Register New Bus</h2>
+                    <form id="addBusForm" class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Registration Number</label>
+                            <input type="text" id="addRegNumber" name="reg_number" class="form-control" required
+                                placeholder="e.g. DHAKA-TA-1234">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Seats</label>
+                            <input type="number" id="addSeats" name="seats" class="form-control" required
+                                placeholder="e.g. 40">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Female Only</label>
+                            <select id="addIsFemale" name="is_female_only" class="form-control">
+                                <option value="0">No</option>
+                                <option value="1">Yes</option>
+                            </select>
+                        </div>
+                        <div class="col-12 mt-3">
+                            <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Add Bus</button>
+                        </div>
+                    </form>
+
+                    <div class="mt-4">
+                        <div id="busList"></div>
+                    </div>
+                </div>
+
+                <div class="content-card">
+                    <h3 class="section-header"><i class="fas fa-clock"></i> Assign Bus to Destination and Time</h3>
+                    <form id="assignBusForm" class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Bus</label>
+                            <select name="bus_id" id="busSelect" class="form-control" required>
+                                <option value="">Select</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Destination</label>
+                            <select name="destination_id" id="destAssignSelect" class="form-control" required>
+                                <option value="">Select</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Time</label>
+                            <select name="time_id" id="timeAssignSelect" class="form-control" required>
+                                <option value="">Select</option>
+                            </select>
+                        </div>
+                        <div class="col-12 mt-3">
+                            <button type="submit" class="btn btn-primary"><i class="fas fa-link"></i> Assign</button>
+                        </div>
+                    </form>
+
+                    <div class="mt-4">
+                        <div id="assignmentList"></div>
+                    </div>
+                </div>
+
+                <div class="footer">
+                    <p>NSUTMS &copy; <span id="currentYear"></span> | Admin Dashboard</p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Bus Modal -->
+    <div class="modal fade" id="editBusModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="editBusForm">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title"><i class="fas fa-edit"></i> Edit Bus</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                            style="filter: invert(1) grayscale(100%) brightness(200%);"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" id="editBusId">
+                        <div class="mb-3">
+                            <label class="form-label">Registration Number</label>
+                            <input type="text" id="editRegNumber" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Seats</label>
+                            <input type="number" id="editSeats" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Female Only</label>
+                            <select id="editIsFemale" class="form-control">
+                                <option value="0">No</option>
+                                <option value="1">Yes</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Assignment Modal -->
+    <div class="modal fade" id="editAssignModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="editAssignForm">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title"><i class="fas fa-edit"></i> Edit Assignment</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                            style="filter: invert(1) grayscale(100%) brightness(200%);"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" id="editAssignId">
+                        <div class="mb-3">
+                            <label class="form-label">Bus</label>
+                            <select id="editAssignBus" class="form-control" required></select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Destination</label>
+                            <select id="editAssignDest" class="form-control" required></select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Time</label>
+                            <select id="editAssignTime" class="form-control" required></select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="../assets/js/jquery.min.js"></script>
+    <script src="../assets/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+    <script src="../assets/js/db.js"></script>
+    <script src="../assets/js/custom.js"></script>
+    <script>
+        const user = requireAuth('admin');
+        if (user) {
+            $('#headerAvatar').text(user.first_name.charAt(0).toUpperCase());
+        }
+        $('#currentYear').text(new Date().getFullYear());
+
+        $(document).on('click', '.btn-close, [data-bs-dismiss="modal"]', function () {
+            $(this).closest('.modal').modal('hide');
+        });
+
+        function loadBuses() {
+            var html = '<table id="busesTable" class="table table-hover table-bordered"><thead><tr><th>ID</th><th>Reg Number</th><th>Seats</th><th>Female Only</th><th>Actions</th></tr></thead><tbody>';
+            db.buses.forEach(function (bus) {
+                html += '<tr><td>' + bus.id + '</td><td>' + bus.reg_number + '</td><td>' + bus.seats + '</td><td>' + (Number(bus.is_female_only) ? '<span class="badge bg-danger">Yes</span>' : '<span class="badge bg-success">No</span>') + '</td><td><button class="btn btn-sm btn-info editBus" data-id="' + bus.id + '" data-reg_number="' + bus.reg_number + '" data-seats="' + bus.seats + '" data-is_female_only="' + bus.is_female_only + '"><i class="fas fa-edit"></i> Edit</button> <button class="btn btn-sm btn-danger deleteBus" data-id="' + bus.id + '"><i class="fas fa-trash"></i> Delete</button></td></tr>';
+            });
+            html += '</tbody></table>';
+
+            if ($.fn.DataTable.isDataTable('#busesTable')) {
+                $('#busesTable').DataTable().destroy();
+            }
+            $('#busList').html(html);
+            $('#busesTable').DataTable();
+
+            // Populate bus select
+            $('#busSelect').html('<option value="">Select</option>');
+            db.buses.forEach(function (bus) {
+                $('#busSelect').append('<option value="' + bus.id + '">' + bus.reg_number + '</option>');
+            });
+        }
+
+        function loadAssignments() {
+            var html = '<table id="assignmentsTable" class="table table-hover table-bordered"><thead><tr><th>ID</th><th>Bus Reg</th><th>Destination</th><th>Time</th><th>Actions</th></tr></thead><tbody>';
+            db.bus_assignments.forEach(function (assign) {
+                const bus = db.buses.find(b => b.id == assign.bus_id) || { reg_number: "Unknown" };
+                const dest = db.destinations.find(d => d.id == assign.destination_id) || { name: "Unknown" };
+                const time = db.bus_times.find(t => t.id == assign.time_id) || { time: "Unknown" };
+
+                html += '<tr><td>' + assign.id + '</td><td>' + bus.reg_number + '</td><td>' + dest.name + '</td><td>' + time.time + '</td><td><button class="btn btn-sm btn-info editAssign" data-id="' + assign.id + '" data-bus_id="' + assign.bus_id + '" data-destination_id="' + assign.destination_id + '" data-time_id="' + assign.time_id + '"><i class="fas fa-edit"></i> Edit</button> <button class="btn btn-sm btn-danger deleteAssign" data-id="' + assign.id + '"><i class="fas fa-trash"></i> Delete</button></td></tr>';
+            });
+            html += '</tbody></table>';
+
+            if ($.fn.DataTable.isDataTable('#assignmentsTable')) {
+                $('#assignmentsTable').DataTable().destroy();
+            }
+            $('#assignmentList').html(html);
+            $('#assignmentsTable').DataTable();
+        }
+
+        function initData() {
+            loadBuses();
+            loadAssignments();
+
+            $('#destAssignSelect').html('<option value="">Select</option>');
+            db.destinations.forEach(function (dest) {
+                $('#destAssignSelect').append('<option value="' + dest.id + '">' + dest.name + '</option>');
+            });
+        }
+
+        $(document).ready(function () {
+            initData();
+        });
+
+        $('#destAssignSelect').change(function () {
+            var destId = $(this).val();
+            $('#timeAssignSelect').html('<option value="">Select</option>');
+            if (destId) {
+                const times = db.bus_times.filter(t => t.destination_id == destId);
+                times.forEach(function (time) {
+                    $('#timeAssignSelect').append('<option value="' + time.id + '">' + time.time + '</option>');
+                });
+            }
+        });
+
+        $('#addBusForm').submit(function (e) {
+            e.preventDefault();
+            const newId = (db.buses.length > 0 ? Math.max(...db.buses.map(b => b.id)) : 0) + 1;
+            db.buses.push({
+                id: newId,
+                reg_number: $('#addRegNumber').val(),
+                seats: $('#addSeats').val(),
+                is_female_only: $('#addIsFemale').val(),
+                created_at: new Date().toISOString()
+            });
+            saveDB();
+            loadBuses();
+            this.reset();
+        });
+
+        $('#assignBusForm').submit(function (e) {
+            e.preventDefault();
+            const newId = (db.bus_assignments.length > 0 ? Math.max(...db.bus_assignments.map(a => a.id)) : 0) + 1;
+            db.bus_assignments.push({
+                id: newId,
+                bus_id: $('#busSelect').val(),
+                destination_id: $('#destAssignSelect').val(),
+                time_id: $('#timeAssignSelect').val()
+            });
+            saveDB();
+            loadAssignments();
+            this.reset();
+        });
+
+        $(document).on('click', '.deleteBus', function () {
+            var busId = $(this).data('id');
+            if (confirm('Delete bus?')) {
+                db.buses = db.buses.filter(b => b.id != busId);
+                db.bus_assignments = db.bus_assignments.filter(a => a.bus_id != busId);
+                saveDB();
+                loadBuses();
+                loadAssignments();
+            }
+        });
+
+        $(document).on('click', '.editBus', function () {
+            var busId = $(this).data('id');
+            var reg = $(this).data('reg_number');
+            var seats = $(this).data('seats');
+            var isFemale = $(this).data('is_female_only');
+
+            $('#editBusId').val(busId);
+            $('#editRegNumber').val(reg);
+            $('#editSeats').val(seats);
+            $('#editIsFemale').val(isFemale);
+
+            $('#editBusModal').modal('show');
+        });
+
+        $('#editBusForm').submit(function (e) {
+            e.preventDefault();
+            var id = parseInt($('#editBusId').val());
+            var bus = db.buses.find(b => b.id === id);
+            if (bus) {
+                bus.reg_number = $('#editRegNumber').val();
+                bus.seats = $('#editSeats').val();
+                bus.is_female_only = $('#editIsFemale').val();
+                saveDB();
+                $('#editBusModal').modal('hide');
+                loadBuses();
+            }
+        });
+
+        $(document).on('click', '.editAssign', function () {
+            var id = $(this).data('id');
+            var bus_id = $(this).data('bus_id');
+            var dest_id = $(this).data('destination_id');
+            var time_id = $(this).data('time_id');
+
+            $('#editAssignId').val(id);
+
+            // Populate selects
+            $('#editAssignBus').html('<option value="">Select Bus</option>');
+            db.buses.forEach(b => $('#editAssignBus').append('<option value="' + b.id + '">' + b.reg_number + '</option>'));
+            $('#editAssignBus').val(bus_id);
+
+            $('#editAssignDest').html('<option value="">Select Dest</option>');
+            db.destinations.forEach(d => $('#editAssignDest').append('<option value="' + d.id + '">' + d.name + '</option>'));
+            $('#editAssignDest').val(dest_id);
+
+            // Populate times for this dest
+            $('#editAssignTime').html('<option value="">Select Time</option>');
+            db.bus_times.filter(t => t.destination_id == dest_id).forEach(t => {
+                $('#editAssignTime').append('<option value="' + t.id + '">' + t.time + '</option>');
+            });
+            $('#editAssignTime').val(time_id);
+
+            $('#editAssignModal').modal('show');
+        });
+
+        $('#editAssignDest').change(function () {
+            var destId = $(this).val();
+            $('#editAssignTime').html('<option value="">Select Time</option>');
+            db.bus_times.filter(t => t.destination_id == destId).forEach(t => {
+                $('#editAssignTime').append('<option value="' + t.id + '">' + t.time + '</option>');
+            });
+        });
+        $(document).on('click', '.deleteAssign', function () {
+            var assignId = $(this).data('id');
+            if (confirm('Delete assignment?')) {
+                db.bus_assignments = db.bus_assignments.filter(a => a.id != assignId);
+                saveDB();
+                loadAssignments();
+            }
+        });
+
+    </script>
+</body>
+
+</html>
