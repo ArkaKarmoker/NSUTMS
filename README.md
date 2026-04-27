@@ -147,54 +147,8 @@ NSUTMS/
 
 The database (`nsutms_db`) contains **7 tables** with foreign key constraints enforcing referential integrity.
 
-```
-┌─────────────────┐       ┌──────────────────┐      ┌──────────────┐
-│     users       │       │      buses        │      │ destinations │
-│─────────────────│       │──────────────────│      │──────────────│
-│ id (PK)         │       │ id (PK)           │      │ id (PK)      │
-│ first_name      │       │ reg_number        │      │ name         │
-│ last_name       │       │ seats             │      │ distance     │
-│ student_id      │       │ is_female_only    │      │ fare         │
-│ email (UNIQUE)  │       │ created_at        │      │ start_coords │
-│ phone           │       └──────────────────┘      │ end_coords   │
-│ gender          │                                  │ start_dest   │
-│ password (hash) │                                  │ end_dest     │
-│ role            │       ┌──────────────────┐      └──────────────┘
-│ driving_license │       │   bus_times      │
-│ nid             │       │──────────────────│      ┌──────────────────┐
-│ years_exp       │       │ id (PK)           │      │  bus_assignments │
-└─────────────────┘       │ destination_id   │←─────│ bus_id (FK)      │
-         │                │ time             │      │ destination_id FK│
-         │                └──────────────────┘      │ time_id (FK)     │
-         │                                          └──────────────────┘
-         │          ┌──────────────────┐
-         │          │     tickets      │
-         └─────────►│──────────────────│
-         │          │ id (PK)          │
-         │          │ student_id (FK)  │
-         │          │ destination_id FK│
-         │          │ time_id (FK)     │
-         │          │ bus_id (FK)      │
-         │          │ seats            │
-         │          │ female_only      │
-         │          │ payment_method   │
-         │          │ payment_status   │
-         │          │ trip_date        │
-         │          └──────────────────┘
-         │
-         │          ┌──────────────────┐
-         └─────────►│      rides       │
-                    │──────────────────│
-                    │ id (PK)          │
-                    │ driver_id (FK)   │
-                    │ bus_id (FK)      │
-                    │ destination_id FK│
-                    │ time_id (FK)     │
-                    │ status           │
-                    │ trip_date        │
-                    │ last_map_coords  │
-                    └──────────────────┘
-```
+<img width="10429" height="13258" alt="NSUTMS_ERD (1)_page-0001" src="https://github.com/user-attachments/assets/2d04db83-3183-4d5e-b44b-4d57b60b3ee1" />
+
 
 ### Table Summary
 
