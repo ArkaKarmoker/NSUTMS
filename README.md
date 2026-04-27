@@ -190,7 +190,7 @@ Role-based routing is enforced on every PHP page via `$_SESSION['role']` checks,
 **1. Clone or copy the project**
 
 ```bash
-git clone https://github.com/your-username/NSUTMS.git
+git clone https://github.com/ArkaKarmoker/NSUTMS.git
 # OR copy the folder manually to your XAMPP htdocs directory
 ```
 
