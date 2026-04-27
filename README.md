@@ -418,3 +418,8 @@ This is an academic project. If you're building on top of it:
 ## 📄 License
 
 This project is developed for academic purposes as part of the NSU CSE311L course. Not licensed for commercial use.
+
+---
+
+<img width="1763" height="5936" alt="Screenshot_28-4-2026_3558_localhost" src="https://github.com/user-attachments/assets/707e291c-5ac2-43dc-bd98-7da9afd30d21" />
+
